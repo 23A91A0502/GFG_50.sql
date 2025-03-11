@@ -108,3 +108,74 @@ JOIN
 products p
 on s.product_id=p.product_id
 where  p.unit_price > 100;
+--11.Retrieve the product name and total sales revenue for each product.
+SELECT p.PRODUCT_NAME, sum(s.TOTAL_PRICE) as total_revenue
+from
+sales s
+join
+products p
+on s.product_id=p.product_id
+group by p.PRODUCT_name;
+
+--12.List all sales along with the corresponding product names.
+select s.sale_id,p.product_name
+from 
+sales s
+left join
+products p
+on s.product_id=p.product_id;
+
+--13.Retrieve the product name and total sales revenue for each product.
+select p.PRODUCT_NAME,sum(s.TOTAL_PRICE) as total_revenue
+from
+sales s
+join
+products p
+on s.product_id=p.product_id
+group by p.product_name;
+
+--14.Rank products based on total sales revenue.
+select p.PRODUCT_NAME,sum(s.TOTAL_PRICE) as total_revenue,
+ rank() over(order by sum(s.TOTAL_PRICE) desc) as revenue_rank
+from
+sales s
+join
+products p
+on s.product_id=p.product_id
+group by p.product_name;
+
+--15.Calculate the running total revenue for each product category.
+select p.PRODUCT_NAME,p.CATEGORY,s.SALE_DATE,
+sum(s.TOTAL_PRICE) over (partition by p.CATEGORY order by s.SALE_DATE) as
+running_total_revenue
+from 
+sales s
+join
+Products p
+on s.product_id=p.product_id;
+
+--16.Categorize sales as "High", "Medium", or "Low" based on total price (e.g., > $200 is High,
+-- $100-$200 is Medium, < $100 is Low).
+SELECT SALE_ID,
+case
+    when TOTAL_PRICE > 200 then 'High'
+    when TOTAL_PRICE between 100 and 200 then 'medium'
+    else 'Low'
+    end as level_
+from sales;
+
+--17. Identify sales where the quantity sold is greater than the average quantity sold.
+
+select *
+from SALES
+where QUANTITY_SOLD > (select avg(QUANTITY_SOLD) as Avg_Quant_sold
+                       from sales);
+
+--18.Extract the month and year from the sale date and count the 
+--number of sales for each month.
+
+--19. Calculate the number of days between the current date and the sale date for each sale.
+
+
+SELECT sale_id, DATEDIFF(NOW(), sale_date) AS days_since_sale
+FROM Sales;
