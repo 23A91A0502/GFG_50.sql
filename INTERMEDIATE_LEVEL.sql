@@ -171,11 +171,57 @@ from SALES
 where QUANTITY_SOLD > (select avg(QUANTITY_SOLD) as Avg_Quant_sold
                        from sales);
 
---18.Extract the month and year from the sale date and count the 
---number of sales for each month.
+select * from sales;
+select * from products;
+--18. Extract the month and year from the sale date and count the number of sales for each month.
+SELECT 
+    EXTRACT(MONTH FROM sale_date) AS sale_month,
+    EXTRACT(YEAR FROM sale_date) AS sale_year,
+    COUNT(*) AS total_sales
+FROM 
+    sales
+GROUP BY 
+    EXTRACT(MONTH FROM sale_date), 
+    EXTRACT(YEAR FROM sale_date);
 
---19. Calculate the number of days between the current date and the sale date for each sale.
+--19.Calculate the number of days between the current date and the sale date for each sale.
+select sale_id,trunc(sysdate) - trunc(sale_date) as num_of_days
+from sales;
+--20. Identify sales made during weekdays versus weekends.
+select sale_id,
+case
+    when extract(day from sale_date) in (1,7) then 'weekend'
+    else 'weekday'
+end as day_type
+from SALES;
+--8.Create a query that lists the product names along with their corresponding sales count.
+
+SELECT p.PRODUCT_NAME, COUNT(s.SALE_ID) AS sales_count
+FROM products p
+LEFT JOIN sales s
+ON p.product_id = s.product_id
+GROUP BY p.PRODUCT_NAME;
+--9.Write a query to find all sales where the total price is greater than the average total price of all sales.
+
+select *
+from SALES
+where total_price > (select avg(total_price) as Avg
+                     from sales);
+
+--11. Add a check constraint to the quantity_sold column 
+--in the Sales table to ensure that the quantity sold is always greater than zero.
+select *
+from sales
+ALTER TABLE Sales
+ADD CONSTRAINT chk_quantity_sold CHECK (quantity_sold > 0);
+--15.Write a query that calculates the total revenue generated from each category of products for the year 2024.
+select p.category,sum(s.total_price) as total_revenue
+FROM
+products p
+left join
+sales s
+on p.product_id=s.product_id
+where extract(year from s.sale_date) = 2024
+group by p.category;
 
 
-SELECT sale_id, DATEDIFF(NOW(), sale_date) AS days_since_sale
-FROM Sales;
